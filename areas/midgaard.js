@@ -104,10 +104,10 @@ module.exports = {
 					}]
 				}, {
 					name: 'Boar',
-					displayName: ['Brown boar', 'Light brown boar'],
+					displayName: ['Brown boar', 'Light brown boar', 'Scarred boar'],
 					level: 1,
-					short: ['a large brown boar', 'a large scarred boar', 'a young tan boar'],
-					long: ['A boar with a number of scars on its side', 'A large brown boar', 'A timid dark brown boar'],
+					short: ['a brown boar', 'a large scarred boar', 'a scarred boar', 'a boar', 'a young tan boar'],
+					long: ['A boar with a number of scars on its side', 'A large brown boar', 'A brown boar'],
 					inName: 'A boar',
 					race: 'animal',
 					id: '6',

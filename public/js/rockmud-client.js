@@ -76,7 +76,7 @@ window.onload = function() {
 
 			rowCnt += 1;
 
-			if (rowCnt >= 160) {
+			if (rowCnt >= 1) {
 				for (i; i < terminal.childNodes.length; i += 1) {
 					terminal.removeChild(terminal.childNodes[i]);
 				}
