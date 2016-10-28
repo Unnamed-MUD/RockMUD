@@ -60,7 +60,7 @@ io = require('socket.io')(server, {
 	transports: ['websocket']
 });
 
-World.setup(io, cfg, function(Character, Cmds, Skills) {
+World.setup(io, cfg, function(Character, Cmds) {
 	server.listen(process.env.PORT || cfg.port);
 
 	io.on('connection', function (s) {
@@ -75,36 +75,6 @@ World.setup(io, cfg, function(Character, Cmds, Skills) {
 						
 						if (cmdObj.cmd in Cmds) {
 							Cmds[cmdObj.cmd](s.player, cmdObj);
-							
-							World.processEvents('onCommand', s.player, cmdObj.roomObj, cmdObj);
-							World.processEvents('onCommand', s.player.items, cmdObj.roomObj, cmdObj);
-						} else if (cmdObj.cmd in Skills) {
-							skillObj = Character.getSkill(s.player, cmdObj.cmd);
-
-							if (skillObj && s.player.wait === 0) {
-								return Skills[cmdObj.cmd](
-									skillObj,
-									s.player,
-									cmdObj.roomObj,
-									cmdObj
-								);
-							
-								World.processEvents('onSkill', s.player, cmdObj.roomObj, skillObj);
-								World.processEvents('onSkill', s.player.items, cmdObj.roomObj, skillObj);
-								World.processEvents('onSkill', cmdObj.roomObj, s.player, skillObj);
-							} else {
-								if (!skillObj) {
-									World.msgPlayer(s, {
-										msg: 'You do not know how to ' + cmdObj.cmd + '.',
-										styleClass: 'error'
-									});
-								} else {
-									World.msgPlayer(s, {
-										msg: '<strong>You can\'t do that yet!.</strong>',
-										styleClass: 'error'
-									});
-								}
-							}
 						} else {
 							World.msgPlayer(s, {
 								msg: cmdObj.cmd + ' is not a valid command.',

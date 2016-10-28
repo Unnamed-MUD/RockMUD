@@ -72,17 +72,7 @@ window.onload = function() {
 		var i = 0;
 	
 		if (addToDom) {
-			terminal.innerHTML += '<div class="row">' + r.msg + '</div>';
-
-			rowCnt += 1;
-
-			if (rowCnt >= 1) {
-				for (i; i < terminal.childNodes.length; i += 1) {
-					terminal.removeChild(terminal.childNodes[i]);
-				}
-
-				rowCnt = 0;
-			}
+			terminal.innerHTML = '<div class="row">' + r.msg + '</div>';
 
 			isScrolledToBottom = terminal.scrollHeight - terminal.clientHeight <= terminal.scrollTop + 1;
 
@@ -143,6 +133,13 @@ window.onload = function() {
 		node.placeholder = 'Enter a Command -- type \'help commands\' for a list of basic commands';
 	}, false);
 	
+	document.addEventListener('colorChange', function(e) {
+		e.preventDefault();
+
+		document.getElementById('colorChange').style.color = e.data.value;
+		
+	}, false);
+	
 	document.getElementById('console').onsubmit = function (e) {
 		var messageNodes = [],
 		msg = node.value.toLowerCase().trim(),
@@ -174,13 +171,14 @@ window.onload = function() {
 	ws.on('msg', function(r) {
 		display(r, true);
 
-		if (r.evt && !r.evt.data) {
+		if (r.evt) {
 			r.evt = new CustomEvent(r.evt);
 			
 			if (!r.data) {
 				document.dispatchEvent(r.evt);
 			} else {
-				document.dispatchEvent(r.evt, r.data);
+				r.evt.data = r.data;
+				document.dispatchEvent(r.evt);
 			}
 		}
 	});

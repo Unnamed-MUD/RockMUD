@@ -6,8 +6,6 @@ var fs = require('fs'),
 World = function() {},
 Character,
 Cmds,
-Skills,
-Spells,
 Room;
 
 World.prototype.setup = function(socketIO, cfg, fn) {
@@ -39,15 +37,19 @@ World.prototype.setup = function(socketIO, cfg, fn) {
 		path = './races/';
 
 		fs.readdir(path, function(err, fileNames) {
-			fileNames.forEach(function(fileName, i) {
-				fs.readFile(path + fileName, function (err, messageTmp) {
-					tmpArr.push(JSON.parse(messageTmp));
+			if (fileNames.length) {
+				fileNames.forEach(function(fileName, i) {
+					fs.readFile(path + fileName, function (err, messageTmp) {
+						tmpArr.push(JSON.parse(messageTmp));
 
-					if (i === fileNames.length - 1) {
-						return fn(err, tmpArr);
-					}
+						if (i === fileNames.length - 1) {
+							return fn(err, tmpArr);
+						}
+					});
 				});
-			});
+			} else {
+				return fn(false, tmpArr);
+			}
 		});
 	},
 	loadClasses = function (fn) {
@@ -55,15 +57,19 @@ World.prototype.setup = function(socketIO, cfg, fn) {
 		path = './classes/';
 	
 		fs.readdir(path, function(err, fileNames) {
-			fileNames.forEach(function(fileName, i) {
-				fs.readFile(path + fileName, function (err, messageTmp) {
-					tmpArr.push(JSON.parse(messageTmp));
+			if (fileNames.length) {
+				fileNames.forEach(function(fileName, i) {
+					fs.readFile(path + fileName, function (err, messageTmp) {
+						tmpArr.push(JSON.parse(messageTmp));
 
-					if (i === fileNames.length - 1) {
-						return fn(err, tmpArr);
-					}
+						if (i === fileNames.length - 1) {
+							return fn(err, tmpArr);
+						}
+					});
 				});
-			});
+			} else {
+				return fn(false, tmpArr);
+			}
 		});
 	},
 	loadTemplates = function (fn) {
@@ -71,32 +77,38 @@ World.prototype.setup = function(socketIO, cfg, fn) {
 		path = './templates/';
 	
 		fs.readdir(path, function(err, fileNames) {
-			fileNames.forEach(function(fileName, i) {
-				fs.readFile(path + fileName, function (err, tmp) {
-					var tmp = JSON.parse(tmp);
+			if (fileNames.length) {
+				fileNames.forEach(function(fileName, i) {
+					fs.readFile(path + fileName, function (err, tmp) {
+						var tmp = JSON.parse(tmp);
 
-					tmp.fileName = fileName.replace(/.json/g, '');
+						tmp.fileName = fileName.replace(/.json/g, '');
 
-					tmpArr.push(tmp);
-	
-					if (i === fileNames.length - 1) {
-						return fn(err, tmpArr);
-					}
+						tmpArr.push(tmp);
+
+						if (i === fileNames.length - 1) {
+							return fn(err, tmpArr);
+						}
+					});
 				});
-			});
+			}
 		});
 	},
 	loadAI = function(fn) {
 		var path = './ai/';
 
 		fs.readdir(path, function(err, fileNames) {
-			fileNames.forEach(function(fileName, i) {
-				world.ai[fileName.replace('.js', '')] = require('.' + path + fileName);
+			if (fileNames.length) {
+				fileNames.forEach(function(fileName, i) {
+					world.ai[fileName.replace('.js', '')] = require('.' + path + fileName);
 
-				if (i === fileNames.length - 1) {
-					return fn(err);
-				}
-			});
+					if (i === fileNames.length - 1) {
+						return fn(err);
+					}
+				});
+			} else {
+				return fn(false);
+			}
 		});
 	};
 
@@ -146,8 +158,6 @@ World.prototype.setup = function(socketIO, cfg, fn) {
 
 							Character = require('./character').character;
 							Cmds = require('./commands').cmd;
-							Skills = require('./skills').skills;
-							Spells = require('./spells').spells;
 							Room = require('./rooms').room;
 
 							world.io = socketIO;
@@ -169,9 +179,9 @@ World.prototype.setup = function(socketIO, cfg, fn) {
 								}
 							}
 
-							world.ticks = require('./ticks');
+							// world.ticks = require('./ticks');
 
-							return fn(Character, Cmds, Skills);
+							return fn(Character, Cmds);
 						});
 					});
 				});

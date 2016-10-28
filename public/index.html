@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 	<head>
-		<title>RockMUD</title>
+		<title>RockMUD - Client side scripting examples</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 		<meta name="HandheldFriendly" content="true" />
@@ -11,12 +11,38 @@
 	<body>
 		<div id="mudwrapper" class="container">
 			<div class="row">
-				<div id="stage" class="col-md-12">
+				<div class="col-md-12">
+					<h1>Client-side JavaScript examples for RockMUD</h1>
+				</div>
+				<div class="col-md-12">
+					<h3>Last Command: <span id="recentCmd">None</span></h3>
+				</div>
+				<div class="col-md-12">
+					<h4>Change text color</h4>
+					<p id="colorChange">Use the 'color' command</p>
+				</div>
+				<div class="col-md-12">
+					<h4>Select a checkbox</h4>
+					<p>Use the 'check' command</p>
+				</div>
+				<div class="col-md-12">
+					<h4>Choose an option</h4>
+					<p>Use the 'choose [option]' command</p>
+				</div>
+				<div class="col-md-12">
+					<h4>Populate a text field</h4>
+					<p>Use the 'populate [string]' command</p>
+				</div>
+				<div class="col-md-12">
+					<h4>Fire a server-side command with onClick</h4>
+					<p>Click the button below</p>
+					<button class="btn-primary">This button creates an alert box with text from the server</button>
 				</div>
 			</div>
+			<hr />
+			<h3>Incoming messages displayed one at a time</h3>
 			<div id="terminal">
-				<div id="mudopen" class="row">
-				</div>
+				<div id="mudopen"></div>
 			</div>
 		</div>
 		<div id="inputwrapper" class="container">

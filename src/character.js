@@ -226,7 +226,7 @@ Character.prototype.create = function(s) {
 	s.player.created = new Date();
 	s.player.saved = null;
 	s.player.role = 'player';
-	s.player.area = 'Midgaard';
+	s.player.area = 'testArea';
 	s.player.roomid = '1';
 	s.player.trains += 25;
 	s.player.deaths = 0;
@@ -307,122 +307,21 @@ Character.prototype.newCharacter = function(s, command) {
 	if (!Cmds) {
 		Cmds = require('./commands').cmd;
 	}
-	
-	if (s.player.creationStep === 1) {
-		World.msgPlayer(s, {
-			msg: '<p>' + s.player.displayName + ' is a new character! There are three steps until '
-				+ s.player.displayName + ' is saved. The <strong>first step</strong> is to '
-				+ '<strong class="red">select a race from the list below by typing in the full name</strong>.',
-			noPrompt: true
-		});
-		
-		Cmds.help(s.player, {
-			msg: 'races',
-			noPrompt: true
-		});
-		
-		s.player.creationStep = 2;
-
-		command.firstCall = true;
-	}
 
 	switch (s.player.creationStep) {
-		case 2:
-			if (!command.firstCall) {
-				if (World.isPlayableRace(command.cmd)) {
-					s.player.creationStep = 3;
-					s.player.race = command.cmd;
-				
-					World.msgPlayer(s, {
-						msg: 'Well done ' + s.player.displayName + ' is a ' + s.player.race + '. Now for the '
-							+ '<strong>second step</strong>, '
-							+ '<strong class="red">select a class from the list below by entering the full name</strong>.',
-						noPrompt: true
-					});
+		case 1:
+				s.player.creationStep = 2;
 
-					Cmds.help(s.player, {
-						msg: 'classes',
-						noPrompt: true
-					});
-				} else {
-					if (command.cmd !== 'help') {
-						World.msgPlayer(s, {
-							msg: 'Not a valid race. Type <span class="green">help races</span> to see the full list. '
-								+ 'You can also access any help file by typing <span class="yellow">help [subject]</span>',
-							noPrompt: true
-						});
-					} else {
-						Cmds.help(s, {
-							msg: command.msg,
-							noPrompt: true
-						});
-					}
-				}
-			}
-		
-			break;
-		case 3:
-			if (World.isPlayableClass(command.cmd)) {
-				s.player.creationStep = 4;
-				s.player.charClass = command.cmd;
-				
 				World.msgPlayer(s, {
-					msg: s.player.displayName + ' is a ' + s.player.charClass
-						+ '! <strong>Two more steps before ' + s.player.displayName
-						+ ' is saved</strong>. Is ' + s.player.displayName + ' <strong class="red">(m)ale</strong> or <strong class="red">(f)emale</strong>?',
-					noPrompt: true,
-					styleClass: 'password-request'
-				});
-			} else {
-				if (command.cmd !== 'help') {
-					World.msgPlayer(s, {
-						msg: 'Not a valid class. Type <span class="red">help classes</span> '
-							+ 'to see the full list of playable classes.',
-						noPrompt: true
-					});
-				} else {
-					Cmds.help(s, {
-						msg: command.msg,
-						noPrompt: true
-					});
-				}
-			}
-
-			break;
-		case 4:
-			if (command.cmd === 'm' || command.cmd === 'f' || command.cmd === 'male' || command.cmd === 'female') {
-				s.player.creationStep = 5;
-
-				if (command.cmd[0] === 'm') {
-					s.player.sex = 'male';
-				} else {
-					s.player.sex = 'female';
-				}
-				
-				World.msgPlayer(s, {
-					msg: s.player.displayName + ' is a ' + s.player.sex
-						+ '! <strong>One more step before ' + s.player.displayName
-						+ ' is saved</strong>. Please define a password (<strong class="yellow">8 or more characters</strong>):', 
+					msg: s.player.displayName + ' needs a password '
+						+ '(<strong class="yellow">8 or more characters</strong>):', 
 					evt: 'reqPassword',
 					noPrompt: true,
 					styleClass: 'password-request'
 				});
-			} else {
-				if (command.cmd !== 'help') {
-					World.msgPlayer(s, {
-						msg: 'Not a valid sex. Enter male or female to define a sex for ' + s.player.displayName  + '.',
-						noPrompt: true
-					});
-				} else {
-					Cmds.help(s, {
-						msg: command.msg,
-						noPrompt: true
-					});
-				}
-			}
 
 			break;
-		case 5:
+		case 2:
 			if (command.cmd.length > 7) {
 				s.player.password = command.cmd;
 				s.player.creationStep = 0;
