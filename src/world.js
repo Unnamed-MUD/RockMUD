@@ -865,25 +865,44 @@ World.prototype.reloadArea = function(area) {
 };
 
 // areaId can be either string or full area object
+// World.prototype.getRoomObject = function(areaId, roomId) {
+// 	var world = this,
+// 	area,
+// 	i = 0;
+//
+// 	if (areaId.id) {
+// 		area = areaId;
+// 	} else {
+// 		area = world.getArea(areaId);
+// 	}
+//
+// 	if (area) {
+// 		for (i; i < area.rooms.length; i += 1) {
+// 			if (roomId == area.rooms[i].id) { //changed this from === to ==
+// 				return area.rooms[i];
+// 			}
+// 		}
+// 	}
+//
+// 	return false;
+// };
+
 World.prototype.getRoomObject = function(areaId, roomId) {
-	var world = this,
-	area,
-	i = 0;
-
-	if (areaId.id) {
-		area = areaId;
-	} else {
-		area = world.getArea(areaId);
-	}
-
-	if (area) {
-		for (i; i < area.rooms.length; i += 1) {
-			if (roomId == area.rooms[i].id) { //changed this from === to ==
-				return area.rooms[i];
+	roomId = roomId.toString();
+	console.log("getRoomObject() " + areaId + ":" + roomId);
+	console.log(this.areas.length + " areas");
+	for (var i = 0; i < this.areas.length; i++) {
+		var area = this.areas[i];
+		console.log(area.rooms.length + " rooms");
+		for (var k = 0; k < area.rooms.length; k++) {
+			var room = area.rooms[k];
+			console.log(room.id + " t:" + (typeof room.id) +  " == " + roomId +" t:" + (typeof roomId) +  " " + (room.id == roomId));
+			if(room.id == roomId) {
+				console.log("FOUND THE ROOM " + roomId + " / " + room.title);
+				return room;
 			}
 		}
 	}
-
 	return false;
 };
 

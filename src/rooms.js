@@ -99,18 +99,18 @@ Room.prototype.getDisplayHTML = function(roomObj, player) {
 				if (monsters[i].long) {
 					displayHTML += '<li class="room-monster grey">' + monsters[i].long + '</li>';
 				} else {
-					displayHTML += '<li class="room-monster grey">' + monsters[i].displayName + ' is ' 
+					displayHTML += '<li class="room-monster grey">' + monsters[i].displayName + ' is '
 						+ monsters[i].position + ' here.</li>';
 				}
 			}
 		}
 
 		i = 0;
-	
+
 		for (i; i < playersInRoom.length; i += 1) {
 			if (playersInRoom[i] !== player) {
 				if (Character.canSeeObject(player, playersInRoom[i])) {
-					displayHTML += '<li class="room-player">' + playersInRoom[i].name 
+					displayHTML += '<li class="room-player">' + playersInRoom[i].name
 						+ ' the ' + playersInRoom[i].race + ' is ' + playersInRoom[i].position + ' here.</li>';
 				}
 			}
@@ -120,22 +120,25 @@ Room.prototype.getDisplayHTML = function(roomObj, player) {
 	displayHTML += '</ul>';
 
 	displayHTML = '<div class="room"><' + titleHtmlTag + ' class="' + titleStyleClass
-		+  '">' + roomObj.title + '</' + titleHtmlTag  + '>' 
+		+  '">' + roomObj.title + '</' + titleHtmlTag  + '>'
 		+ '<p class="room-content">' + roomObj.content + '</p>' + displayHTML + '</div>';
 
 	return displayHTML;
 };
 
-// Get an exit from a room by direction; 
+// Get an exit from a room by direction;
 // empty direction results in an array of all exit objects
-Room.prototype.getExit = function(roomObj, direction) { 
+Room.prototype.getExit = function(roomObj, direction) {
+	console.log("getting exits of room '" + roomObj.title + "' with direction '"+ direction + "'" );
 	var i = 0;
 
 	if (roomObj.exits.length > 0) {
 		for (i; i < roomObj.exits.length; i += 1) {
 			if (direction === roomObj.exits[i].cmd) {
+				console.log("Found exit matching direction");
 				return roomObj.exits[i];
 			} else if (roomObj.exits[i].door && roomObj.exits[i].door.name === direction) {
+				console.log("found exit DOOR matching direction");
 				return roomObj.exits[i];
 			}
 		}
@@ -207,13 +210,13 @@ Room.prototype.getBrief = function(roomObj, options) {
 
 	if (monsters.length > 0 || playersInRoom.length > 0) {
 		displayHTML += '<ul class="room-here list-inline">';
-		
+
 		for (i; i < monsters.length; i += 1) {
 			if (!monsters[i].short) {
-				displayHTML += '<li class="room-monster yellow">' + monsters[i].displayName + ' is ' 
+				displayHTML += '<li class="room-monster yellow">' + monsters[i].displayName + ' is '
 					+ monsters[i].position + ' there.</li>';
 			} else {
-				displayHTML += '<li class="room-monster yellow">' + monsters[i].short + ' is ' 
+				displayHTML += '<li class="room-monster yellow">' + monsters[i].short + ' is '
 				 + monsters[i].position + ' there.</li>';
 			}
 		}
@@ -222,7 +225,7 @@ Room.prototype.getBrief = function(roomObj, options) {
 
 		for (i; i < playersInRoom.length; i += 1) {
 			if (!options || !options.hideCallingPlayer || options.hideCallingPlayer !== playersInRoom[i].name ) {
-				displayHTML += '<li class="room-player">' + playersInRoom[i].name 
+				displayHTML += '<li class="room-player">' + playersInRoom[i].name
 					+ ' the ' + playersInRoom[i].race + ' is ' + playersInRoom[i].position + ' there.</li>';
 			}
 		}
@@ -246,7 +249,7 @@ Room.prototype.getBrief = function(roomObj, options) {
 Room.prototype.getTrainers = function(roomObj) {
 	var i = 0,
 	trainers = [];
-	
+
 	for (i; i < roomObj.monsters.length; i += 1) {
 		if (roomObj.monsters[i].trainer) {
 			trainers.push(roomObj.monsters[i]);
@@ -259,41 +262,41 @@ Room.prototype.getTrainers = function(roomObj) {
 Room.prototype.getMerchants = function(roomObj) {
 	var i = 0,
 	merchants = [],
-	possibleMerchants = roomObj.monsters.concat(roomObj.playersInRoom); 
-	
+	possibleMerchants = roomObj.monsters.concat(roomObj.playersInRoom);
+
 	for (i; i < possibleMerchants.length; i += 1) {
 		if (possibleMerchants[i].merchant === true) {
 			merchants.push(possibleMerchants[i]);
 		}
 	}
-	
+
 	return merchants;
 };
 
 Room.prototype.getMerchant = function(roomObj, command) {
 	var i = 0,
 	merchant = false,
-	possibleMerchants = roomObj.monsters.concat(roomObj.playersInRoom), 
+	possibleMerchants = roomObj.monsters.concat(roomObj.playersInRoom),
 	pattern = new RegExp('^' + command.arg),
 	len = possibleMerchants.length;
-	
+
 	for (i; i < len; i += 1) {
 		if (!possibleMerchants[i].isPlayer) {
 			if (possibleMerchants[i].merchant === true) {
 				if (pattern.test(possibleMerchants[i].name.toLowerCase())) {
 					merchant = possibleMerchants[i];
 				} else if (merchant.short && pattern.test(possibleMerchants[i].short.toLowerCase())) {
-				
+
 				}
-			} 
+			}
 		} else {
 			if (possibleMerchants[i].merchant === true && pattern.test(possibleMerchants[i].name.toLowerCase())) {
 				merchant = possibleMerchants[i];
 			}
 		}
 	}
-	
-	return merchant;  
+
+	return merchant;
 };
 
 Room.prototype.getWatersources = function(roomObj) {
@@ -301,14 +304,14 @@ Room.prototype.getWatersources = function(roomObj) {
 	results = [],
 	arrToSearch = roomObj.items.concat(roomObj.monsters),
 	len = arrToSearch.length;
-	
+
 	for (i; i < len; i += 1) {
 		if (arrToSearch[i].waterSource === true) {
 			results.push(arrToSearch[i]);
 		}
 	}
-	
-	return results;  
+
+	return results;
 };
 
 Room.prototype.getWatersource = function(roomObj, command) {
@@ -316,14 +319,14 @@ Room.prototype.getWatersource = function(roomObj, command) {
 	waterSource = false,
 	pattern = new RegExp('^' + command.arg),
 	len = roomObj.items.length;
-	
+
 	for (i; i < len; i += 1) {
 		if (roomObj.items[i].waterSource === true && pattern.test(roomObj.items[i].name.toLowerCase())) {
 			waterSource = roomObj.items[i];
 		}
 	}
-	
-	return waterSource;  
+
+	return waterSource;
 };
 
 Room.prototype.addItem = function(roomObj, item) {
