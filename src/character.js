@@ -102,7 +102,7 @@ Character.prototype.load = function(name, s, fn) {
 		if (err) {
 			throw err;
 		}
-		
+
 		s.player = r;
 
 		s.player.displayName = s.player.name.charAt(0).toUpperCase() + s.player.name.slice(1);
@@ -157,7 +157,6 @@ Character.prototype.getPassword = function(s, command, fn) {
 					World.sendMotd(s);
 
 					roomObj = World.getRoomObject(s.player.area, s.player.roomid);
-
 					roomObj.playersInRoom.push(s.player);
 
 					fn(s);
@@ -355,7 +354,7 @@ Character.prototype.newCharacter = function(s, command) {
 				if (World.isPlayableRace(command.cmd)) {
 					s.player.creationStep = 3;
 					s.player.race = command.cmd;
-				
+
 					World.msgPlayer(s, {
 						msg: 'Well done ' + s.player.displayName + ' is a ' + s.player.race + '. Now for the '
 							+ '<strong>second step</strong>, '
@@ -425,7 +424,7 @@ Character.prototype.newCharacter = function(s, command) {
 				World.msgPlayer(s, {
 					msg: s.player.displayName + ' is a ' + s.player.sex
 						+ '! <strong>One more step before ' + s.player.displayName
-						+ ' is saved</strong>. Please define a password (<strong class="yellow">8 or more characters</strong>):', 
+						+ ' is saved</strong>. Please define a password (<strong class="yellow">8 or more characters</strong>):',
 					evt: 'reqPassword',
 					noPrompt: true,
 					styleClass: 'password-request'
@@ -551,7 +550,7 @@ Character.prototype.manaRegen = function(target) {
 			if (!intMod) {
 				intMod = World.dice.roll(1, 2) - 1;
 			}
-			
+
 			total = World.dice.roll(intMod, 8, target.level/3);
 
 			target.cmana += total;
@@ -566,7 +565,7 @@ Character.prototype.manaRegen = function(target) {
 Character.prototype.mvRegen = function(target) {
 	var dexMod = World.dice.getDexMod(target) + 1,
 	total;
-	
+
 	if (target.cmv < target.mv && target.thirst < 7 && target.hunger < 8) {
 		if (target.position === 'sleeping') {
 			dexMod += 3;
@@ -757,7 +756,7 @@ Character.prototype.getSlotsWithShields = function(player) {
 	shields = [];
 
 	for (i; i < player.eq.length; i += 1) {
-		if (player.eq[i].slot === 'hands' && player.eq[i].item 
+		if (player.eq[i].slot === 'hands' && player.eq[i].item
 			&& player.eq[i].item.itemType === 'shield') {
 			shields.push(player.eq[i]);
 		}
@@ -966,7 +965,7 @@ Character.prototype.getSkillById = function(player, skillId) {
 Character.prototype.meetsSkillPrepreqs = function(player, skillObj) {
 	var prop,
 	requiredSkillObj;
-	
+
 	if (skillObj.prerequisites) {
 		for (prop in skillObj.prerequisites) {
 			if (prop !== 'skill') {
@@ -977,7 +976,7 @@ Character.prototype.meetsSkillPrepreqs = function(player, skillObj) {
 				}
 			} else {
 				requiredSkillObj = this.getSkillById(player, skillObj.prerequisites.skill.id);
-				
+
 				if (!requiredSkillObj) {
 					return false
 				} else {
@@ -989,7 +988,7 @@ Character.prototype.meetsSkillPrepreqs = function(player, skillObj) {
 				}
 			}
 		}
-		
+
 		return true;
 	} else {
 		return true;
@@ -1023,7 +1022,7 @@ Character.prototype.removeEq = function(player, item) {
 			player.eq[i].item = null;
 		}
 	}
-	
+
 	this.removeStatMods(player, item);
 
 	World.msgPlayer(player, {
@@ -1074,7 +1073,7 @@ Character.prototype.addLog = function(player, questId, logEntryId) {
 			for (prop in World.quests[i].entries) {
 				if (prop === logEntryId) {
 					player.log.push({
-						id: questId, 
+						id: questId,
 						entryId: logEntryId,
 						quest: World.quests[i].quest
 					});
@@ -1086,7 +1085,7 @@ Character.prototype.addLog = function(player, questId, logEntryId) {
 
 Character.prototype.getPersonalPronoun = function(player) {
 	if (player.sex === 'male') {
-		return 'his';	
+		return 'his';
 	} else if (player.sex === 'female') {
 		return 'her';
 	} else {
@@ -1124,7 +1123,7 @@ Character.prototype.removeStatMods = function(player, item) {
 
 Character.prototype.wearWeapon = function(target, weapon, roomObj) {
 	var slot = this.getEmptyWeaponSlot(target);
-	
+
 	if (!weapon.equipped) {
 		if (slot) {
 			weapon.equipped = true;
@@ -1178,13 +1177,13 @@ Character.prototype.wearShield = function(target, shield, roomObj) {
 
 Character.prototype.wearArmor = function(target, armor, roomObj) {
 	var slot = this.getSlot(target, armor.slot);
-	
+
 	if (!armor.equipped) {
 		if (slot) {
-			armor.equipped = true;	
+			armor.equipped = true;
 
 			slot.item = armor.refId;
-		
+
 			World.msgPlayer(target, {
 				msg: 'You wear a ' + armor.short + ' on your ' + slot.name.toLowerCase() + '.'
 			});
@@ -1253,7 +1252,7 @@ Character.prototype.canSee = function(player, roomObj) {
 			canSee = false;
 		}
 	}
-	
+
 	if (!canSee && player.sight) {
 		light = this.getLights(player)[0];
 
@@ -1276,7 +1275,7 @@ Character.prototype.createCorpse = function(player) {
 		level: player.level,
 		name: 'Corpse of ' + player.displayName,
 		short: 'the corpse of ' + corpseDisplayStr,
-		capitalShort: 'The corpse of ' + corpseDisplayStr, 
+		capitalShort: 'The corpse of ' + corpseDisplayStr,
 		long: 'The corpse of ' + corpseDisplayStr + ' is lying here on the ground.',
 		decay: 1,
 		itemType: 'corpse',
@@ -1352,7 +1351,7 @@ Character.prototype.level = function(player) {
 	if (player.intMod > 4) {
 		newTrains += 1;
 	}
- 
+
 	if (player.mainStat === 'con' || player.mainStat === 'str') {
 		hpBonus += World.dice.roll(1, 4);
 		manaBonus = 0;
@@ -1365,7 +1364,7 @@ Character.prototype.level = function(player) {
 
 	if (player.mainStat === 'dex') {
 		hpBonus -= 3;
-		mvBonus += World.dice.roll(1, 6);	
+		mvBonus += World.dice.roll(1, 6);
 	}
 
 	player.level += 1;
@@ -1377,7 +1376,7 @@ Character.prototype.level = function(player) {
 	player.exp = 0;
 
 	World.msgPlayer(player, {
-		msg: 'You have reached level ' + player.level + '. Your efforts result in ' 
+		msg: 'You have reached level ' + player.level + '. Your efforts result in '
 			+ hpBonus + ' hp, ' + manaBonus + ' mana, ' + mvBonus + ' movement and '
 			+ newTrains + ' new trains.'
 	});
