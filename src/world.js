@@ -23,6 +23,8 @@ function loadFromDB(callback) {
 };
 function sortRooms(rooms) {
 	var areaTemplate = {
+		name: '', // these two values are filled in futher down this function
+		id: '', // blanks just so we can see them in the template
 		type: 'city',
 		levels: 'All',
 		description: 'The first city.',
@@ -270,6 +272,7 @@ World.prototype.setup = function(socketIO, cfg, fn) {
 	}
 
 	world.monsters = require('./monsters.js');
+	world.items = require('./items.js');
 
 	loadAreas(function(areas) {
 		loadTime(function(err, time) {
@@ -524,6 +527,8 @@ World.prototype.rollItems = function(itemArr, roomid, area) {
 	for (i; i < itemArr.length; i += 1) {
 		if (itemArr[i].spawn && itemArr[i].spawn > 1 ) {
 			itemArr[i].spawn -= 1;
+			// @note : why does he stringify and reparse? trying to make sure data is clean?
+			//         thats what databases are for!!!!
 			itemArr.push(JSON.parse(JSON.stringify(itemArr[i])));
 		}
 
@@ -777,7 +782,7 @@ World.prototype.setupArea = function(area, fn) {
 						}
 				}
 
-				// note: this is weird, seems like it would overwrite area.monsters
+				// @note this is weird, seems like it would overwrite area.monsters
 				//       if there was more than one room in an area with monsters??
 				area.monsters = world.shuffle(area.rooms[i].monsters);
 			}
@@ -971,6 +976,26 @@ World.prototype.getAllMonstersFromArea = function(areaId) {
 	for (i; i < area.rooms.length; i += 1) {
 		if (area.rooms[i].monsters.length > 0) {
 			mobArr = mobArr.concat(area.rooms[i].monsters);
+		}
+	}
+
+	return mobArr;
+};
+
+// @ours : get all across areas
+World.prototype.getAllMonsters = function() {
+	var world = this,
+	area,
+	i = 0,
+	mobArr = [];
+
+	for(var a = 0; a < this.areas.length; a++){
+		area = world.getArea(this.areas[a].id);
+
+		for (i; i < area.rooms.length; i += 1) {
+			if (area.rooms[i].monsters.length > 0) {
+				mobArr = mobArr.concat(area.rooms[i].monsters);
+			}
 		}
 	}
 

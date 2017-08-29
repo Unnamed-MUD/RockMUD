@@ -91,6 +91,30 @@ Cmd.prototype.whizinvis = function(target, command) {
 	});
 };
 
+// @ours : top level 'dev [command]'
+Cmd.prototype.dev = function (target, command) {
+	if(command.msg == 'monsters') return _devMonsters(target, command);
+};
+
+// @ours : private function to list all monsters
+function _devMonsters (target, command) {
+	var monsters = [];
+	var monsters = World.getAllMonsters();
+	World.msgPlayer(target, {
+		msg: monsters.length + " monsters",
+		noPrompt: true
+	});
+	var multiline = '';
+	var br = '';
+	monsters.forEach(function (monster) {
+		multiline += br + monster.name;
+		br = "<br/>";
+	});
+	World.msgPlayer(target, {
+		msg: multiline
+	});
+}
+
 Cmd.prototype.buy = function(target, command) {
 	var i = 0,
 	roomObj,
@@ -2080,14 +2104,19 @@ Cmd.prototype.kill = function(player, command, avoidGroupCheck, fn) {
 
 
 			if (!command.target) {
+				console.log("!command.target is true");
 				opponent = World.search(roomObj.monsters, command);
 			} else {
+				console.log("command.target = " + command.target);
 				opponent = command.target;
 			}
 
 			if (!opponent) {
+				console.log("still no opponent, searching for " + command);
 				opponent = World.search(roomObj.playersInRoom, command);
 			}
+
+			console.log(opponent);
 
 			if (opponent && opponent.roomid === player.roomid) {
 				World.msgPlayer(player, {
