@@ -94,22 +94,29 @@ Cmd.prototype.whizinvis = function(target, command) {
 // @ours : top level 'dev [command]'
 Cmd.prototype.dev = function (target, command) {
 	if(command.msg == 'monsters') return _devMonsters(target, command);
+	World.msgPlayer(target, {
+		msg: 'dev functions: monsters'
+	});
 };
 
 // @ours : private function to list all monsters
 function _devMonsters (target, command) {
-	var monsters = [];
 	var monsters = World.getAllMonsters();
 	World.msgPlayer(target, {
 		msg: monsters.length + " monsters",
 		noPrompt: true
 	});
+
 	var multiline = '';
-	var br = '';
-	monsters.forEach(function (monster) {
-		multiline += br + monster.name;
-		br = "<br/>";
+	var currentArea = ''; // if diff than current monster's area, change and print it
+	monsters.forEach(function (obj) {
+		if(currentArea != obj.room.area) {
+			currentArea = obj.room.area;
+			multiline += 'AREA ' + currentArea + '<br/>';
+		}
+		multiline += '- ' + obj.monster.name + ' in ' + obj.room.title + '<br/>';
 	});
+
 	World.msgPlayer(target, {
 		msg: multiline
 	});
@@ -2104,19 +2111,14 @@ Cmd.prototype.kill = function(player, command, avoidGroupCheck, fn) {
 
 
 			if (!command.target) {
-				console.log("!command.target is true");
 				opponent = World.search(roomObj.monsters, command);
 			} else {
-				console.log("command.target = " + command.target);
 				opponent = command.target;
 			}
 
 			if (!opponent) {
-				console.log("still no opponent, searching for " + command);
 				opponent = World.search(roomObj.playersInRoom, command);
 			}
-
-			console.log(opponent);
 
 			if (opponent && opponent.roomid === player.roomid) {
 				World.msgPlayer(player, {

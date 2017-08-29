@@ -775,7 +775,9 @@ World.prototype.setupArea = function(area, fn) {
 						var monsterName = area.rooms[i].monsters[m];
 						var foundMonster = world.getMonster(monsterName);
 						if(foundMonster) {
-							area.rooms[i].monsters[m] = foundMonster;
+							// we have to clone the foundMonster so each instance in game is unique
+							area.rooms[i].monsters[m] = Object.assign({}, foundMonster);
+
 						} else {
 							console.error("🚨  Room '" + area.rooms[i].title + "' has monster '" + monsterName + "' not in database, removing from room.");
 							area.rooms[i].monsters.splice(m, 1);
@@ -991,10 +993,14 @@ World.prototype.getAllMonsters = function() {
 
 	for(var a = 0; a < this.areas.length; a++){
 		area = world.getArea(this.areas[a].id);
-
-		for (i; i < area.rooms.length; i += 1) {
+		for (i = 0; i < area.rooms.length; i ++) {
 			if (area.rooms[i].monsters.length > 0) {
-				mobArr = mobArr.concat(area.rooms[i].monsters);
+				area.rooms[i].monsters.forEach(function (monster) {
+					mobArr.push({
+						monster: monster,
+						room: area.rooms[i]
+					});
+				});
 			}
 		}
 	}
@@ -1120,15 +1126,16 @@ World.prototype.prompt = function(target) {
 	}
 
 	prompt = '<div class="col-md-12"><div class="cprompt"><strong><'
-	+ player.chp + '/'  + player.hp + '<span class="red">hp</span>><'
-	+ player.cmana + '/'  + player.mana + '<span class="blue">m</span>><'
+	+ player.chp + '/'  + player.hp + '<span class="red">hp</span> '
+	+ player.cmana + '/'  + player.mana + '<span class="blue">m</span> '
 	+ player.cmv + '/'  + player.mv +'<span class="warning">mv</span>></strong></div>';
 
-	if (player.sid) {
-		prompt += '<' + player.wait + 'w>';
-	}
+	// @note : why show this?
+	// if (player.sid) {
+	// 	prompt += '<' + player.wait + 'w>';
+	// }
 
-	prompt += '</div>';
+	prompt += '</div><br/><br/>';
 
 	return prompt;
 };
