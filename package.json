@@ -2,7 +2,9 @@
   "name": "rockmud",
   "subdomain": "rockmud.heroku",
   "dependencies": {
+    "glob": "^7.1.2",
     "mongodb": "^2.2.31",
+    "safe-clone-deep": "^1.1.5",
     "socket.io": "^2.0.0"
   },
   "version": "0.3.5",

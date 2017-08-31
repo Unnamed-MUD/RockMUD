@@ -62,6 +62,7 @@ io = require('socket.io')(server, {
 
 World.setup(io, cfg, function(Character, Cmds, Skills) {
 	server.listen(process.env.PORT || cfg.port);
+	console.log("RockMUD listening on " + (process.env.PORT || cfg.port));
 
 	io.on('connection', function (s) {
 		var parseCmd = function(r, s) {
@@ -70,7 +71,7 @@ World.setup(io, cfg, function(Character, Cmds, Skills) {
 			valid = false;
 
 			valid = World.isSafeCommand(cmdObj);
-			
+
 			if (!s.player.creationStep) {
 				if (valid) {
 					if (cmdObj.cmd) {
@@ -130,8 +131,8 @@ World.setup(io, cfg, function(Character, Cmds, Skills) {
 		};
 
 		World.msgPlayer(s, {
-			msg : 'Enter your name:', 
-			evt: 'reqInitialLogin', 
+			msg : 'Enter your name:',
+			evt: 'reqInitialLogin',
 			styleClass: 'enter-name',
 			noPrompt: true
 		});
@@ -142,7 +143,7 @@ World.setup(io, cfg, function(Character, Cmds, Skills) {
 					Character.login(r, s, function (s) {
 						if (s.player) {
 							s.player.verifiedName = true;
-							s.join('mud'); // mud is one of two rooms, 'creation' being the other		
+							s.join('mud'); // mud is one of two rooms, 'creation' being the other
 
 							World.msgPlayer(s, {
 								msg: 'Password for ' + s.player.displayName  + ': ',
@@ -163,7 +164,7 @@ World.setup(io, cfg, function(Character, Cmds, Skills) {
 
 							parseCmd(r, s);
 						}
-					})			
+					})
 				} else if (r.msg && s.player && !s.player.verifiedPassword) {
 					Character.getPassword(s, Cmds.createCommandObject(r), function(s) {
 						s.player.verifiedPassword = true;

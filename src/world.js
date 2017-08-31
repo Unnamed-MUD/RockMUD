@@ -2,8 +2,10 @@
 * Working with game-wide data. Areas, races, classes and game time
 */
 'use strict';
-var fs = require('fs'),
-World = function() {},
+var fs = require('fs');
+var clone = require('safe-clone-deep');
+var crypto = require('crypto');
+var World = function() {},
 Character,
 Cmds,
 Skills,
@@ -23,6 +25,8 @@ function loadFromDB(callback) {
 };
 function sortRooms(rooms) {
 	var areaTemplate = {
+		name: '', // these two values are filled in futher down this function
+		id: '', // blanks just so we can see them in the template
 		type: 'city',
 		levels: 'All',
 		description: 'The first city.',
@@ -44,7 +48,7 @@ function sortRooms(rooms) {
 	var tempareas = {};
 	for (var i = 0; i < rooms.length; i++) {
 		var room = rooms[i];
-		room.id = room._id;
+		room.id = room._id.toString();
 		room.playersInRoom = [];
 		if (!tempareas[room.area]) {
 			tempareas[room.area] = []
@@ -240,6 +244,7 @@ World.prototype.setup = function(socketIO, cfg, fn) {
 	world.classes = []; // Class JSON definition is in memory
 	world.areas = []; // Loaded areas
 	world.players = []; // Loaded players
+	world.monsters = [];
 	world.time = null; // Current Time data
 	world.itemTemplate = {};
 	world.mobTemplate = {};
@@ -268,6 +273,9 @@ World.prototype.setup = function(socketIO, cfg, fn) {
 		}
 	}
 
+	world.monsters = require('./monsters.js');
+	world.items = require('./items.js');
+
 	loadAreas(function(areas) {
 		loadTime(function(err, time) {
 			loadRaces(function(err, races) {
@@ -287,7 +295,6 @@ World.prototype.setup = function(socketIO, cfg, fn) {
 							});
 
 							world.areas = areas;
-						//	console.log(world.areas);
 							world.time = time;
 							world.races = races;
 							world.classes = classes;
@@ -522,6 +529,8 @@ World.prototype.rollItems = function(itemArr, roomid, area) {
 	for (i; i < itemArr.length; i += 1) {
 		if (itemArr[i].spawn && itemArr[i].spawn > 1 ) {
 			itemArr[i].spawn -= 1;
+			// @note : why does he stringify and reparse? trying to make sure data is clean?
+			//         thats what databases are for!!!!
 			itemArr.push(JSON.parse(JSON.stringify(itemArr[i])));
 		}
 
@@ -761,7 +770,24 @@ World.prototype.setupArea = function(area, fn) {
 				}
 			}
 
+			// replace all monster strings with the actual object
 			if (area.rooms[i].monsters) {
+				for(var m = area.rooms[i].monsters.length-1; m >= 0; m--) {
+						var monsterName = area.rooms[i].monsters[m];
+						var foundMonster = world.getMonster(monsterName);
+						if(foundMonster) {
+							// we have to clone the foundMonster so each instance in game is unique
+							area.rooms[i].monsters[m] = clone(foundMonster);
+							//area.rooms[i].monsters[m].rando = (Math.random()+'').slice(2, 10	);
+
+						} else {
+							console.error("🚨  Room '" + area.rooms[i].title + "' has monster '" + monsterName + "' not in monsters/, removing from room.");
+							area.rooms[i].monsters.splice(m, 1);
+						}
+				}
+
+				// @note this is weird, seems like it would overwrite area.monsters
+				//       if there was more than one room in an area with monsters??
 				area.monsters = world.shuffle(area.rooms[i].monsters);
 			}
 
@@ -844,6 +870,17 @@ World.prototype.getArea = function(areaId) {
 	return null;
 };
 
+// @ours: String as input
+World.prototype.getMonster = function(monsterName) {
+	monsterName = monsterName.toLowerCase();
+	for(var i =0; i < this.monsters.length; i++) {
+		if(this.monsters[i].name.toLowerCase() == monsterName) {
+			return this.monsters[i];
+		}
+	}
+	return false;
+}
+
 World.prototype.reloadArea = function(area) {
 	var world = this,
 	newArea;
@@ -889,16 +926,16 @@ World.prototype.reloadArea = function(area) {
 
 World.prototype.getRoomObject = function(areaId, roomId) {
 	roomId = roomId.toString();
-	console.log("getRoomObject() " + areaId + ":" + roomId);
-	console.log(this.areas.length + " areas");
+//	console.log("getRoomObject() " + areaId + ":" + roomId);
+//	console.log(this.areas.length + " areas");
 	for (var i = 0; i < this.areas.length; i++) {
 		var area = this.areas[i];
-		console.log(area.rooms.length + " rooms");
+	//	console.log(area.rooms.length + " rooms");
 		for (var k = 0; k < area.rooms.length; k++) {
 			var room = area.rooms[k];
-			console.log(room.id + " t:" + (typeof room.id) +  " == " + roomId +" t:" + (typeof roomId) +  " " + (room.id == roomId));
+		//	console.log(room.id + " t:" + (typeof room.id) +  " == " + roomId +" t:" + (typeof roomId) +  " " + (room.id == roomId));
 			if(room.id == roomId) {
-				console.log("FOUND THE ROOM " + roomId + " / " + room.title);
+			//	console.log("FOUND THE ROOM " + roomId + " / " + room.title);
 				return room;
 			}
 		}
@@ -943,6 +980,30 @@ World.prototype.getAllMonstersFromArea = function(areaId) {
 	for (i; i < area.rooms.length; i += 1) {
 		if (area.rooms[i].monsters.length > 0) {
 			mobArr = mobArr.concat(area.rooms[i].monsters);
+		}
+	}
+
+	return mobArr;
+};
+
+// @ours : get all across areas
+World.prototype.getAllMonsters = function() {
+	var world = this,
+	area,
+	i = 0,
+	mobArr = [];
+
+	for(var a = 0; a < this.areas.length; a++){
+		area = world.getArea(this.areas[a].id);
+		for (i = 0; i < area.rooms.length; i ++) {
+			if (area.rooms[i].monsters.length > 0) {
+				area.rooms[i].monsters.forEach(function (monster) {
+					mobArr.push({
+						monster: monster,
+						room: area.rooms[i]
+					});
+				});
+			}
 		}
 	}
 
@@ -1067,15 +1128,16 @@ World.prototype.prompt = function(target) {
 	}
 
 	prompt = '<div class="col-md-12"><div class="cprompt"><strong><'
-	+ player.chp + '/'  + player.hp + '<span class="red">hp</span>><'
-	+ player.cmana + '/'  + player.mana + '<span class="blue">m</span>><'
+	+ player.chp + '/'  + player.hp + '<span class="red">hp</span> '
+	+ player.cmana + '/'  + player.mana + '<span class="blue">m</span> '
 	+ player.cmv + '/'  + player.mv +'<span class="warning">mv</span>></strong></div>';
 
-	if (player.sid) {
-		prompt += '<' + player.wait + 'w>';
-	}
+	// @note : why show this?
+	// if (player.sid) {
+	// 	prompt += '<' + player.wait + 'w>';
+	// }
 
-	prompt += '</div>';
+	prompt += '</div><br/><br/>';
 
 	return prompt;
 };

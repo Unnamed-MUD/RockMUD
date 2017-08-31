@@ -91,6 +91,37 @@ Cmd.prototype.whizinvis = function(target, command) {
 	});
 };
 
+// @ours : top level 'dev [command]'
+Cmd.prototype.dev = function (target, command) {
+	if(command.msg == 'monsters') return _devMonsters(target, command);
+	World.msgPlayer(target, {
+		msg: 'dev functions: monsters'
+	});
+};
+
+// @ours : private function to list all monsters
+function _devMonsters (target, command) {
+	var monsters = World.getAllMonsters();
+	World.msgPlayer(target, {
+		msg: monsters.length + " monsters",
+		noPrompt: true
+	});
+
+	var multiline = '';
+	var currentArea = ''; // if diff than current monster's area, change and print it
+	monsters.forEach(function (obj) {
+		if(currentArea != obj.room.area) {
+			currentArea = obj.room.area;
+			multiline += 'AREA ' + currentArea + '<br/>';
+		}
+		multiline += '- ' + obj.monster.name + ' '  +obj.monster.rando + ' in ' + obj.room.title + '<br/>';
+	});
+
+	World.msgPlayer(target, {
+		msg: multiline
+	});
+}
+
 Cmd.prototype.buy = function(target, command) {
 	var i = 0,
 	roomObj,
@@ -2080,6 +2111,8 @@ Cmd.prototype.kill = function(player, command, avoidGroupCheck, fn) {
 
 
 			if (!command.target) {
+				roomObj.monsters.forEach(function (monster) {
+				});
 				opponent = World.search(roomObj.monsters, command);
 			} else {
 				opponent = command.target;
@@ -2112,6 +2145,10 @@ Cmd.prototype.kill = function(player, command, avoidGroupCheck, fn) {
 			} else {
 				World.msgPlayer(player, {
 					msg: 'There is nothing by that name here.',
+					styleClass: 'error'
+				});
+				World.msgPlayer(player, {
+					msg: 'opponent room id ' + opponent.roomid + " player " + player.roomid,
 					styleClass: 'error'
 				});
 			}

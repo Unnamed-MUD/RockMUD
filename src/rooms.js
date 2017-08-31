@@ -129,16 +129,16 @@ Room.prototype.getDisplayHTML = function(roomObj, player) {
 // Get an exit from a room by direction;
 // empty direction results in an array of all exit objects
 Room.prototype.getExit = function(roomObj, direction) {
-	console.log("getting exits of room '" + roomObj.title + "' with direction '"+ direction + "'" );
+	//console.log("getting exits of room '" + roomObj.title + "' with direction '"+ direction + "'" );
 	var i = 0;
 
 	if (roomObj.exits.length > 0) {
 		for (i; i < roomObj.exits.length; i += 1) {
 			if (direction === roomObj.exits[i].cmd) {
-				console.log("Found exit matching direction");
+				//console.log("Found exit matching direction");
 				return roomObj.exits[i];
 			} else if (roomObj.exits[i].door && roomObj.exits[i].door.name === direction) {
-				console.log("found exit DOOR matching direction");
+				//console.log("found exit DOOR matching direction");
 				return roomObj.exits[i];
 			}
 		}
