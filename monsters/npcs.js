@@ -19,7 +19,7 @@ module.exports = [{
     damRoll: 10,
     hitRoll: 10,
     ac: 20,
-    wanderCheck: 50,
+    wanderCheck: 90,
     // this is asking if we want to run the ai behaviors when theres no players in the room with the mob
     runOnAliveWhenEmpty: true,
     items: [{
