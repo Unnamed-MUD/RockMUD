@@ -114,7 +114,7 @@ function _devMonsters (target, command) {
 			currentArea = obj.room.area;
 			multiline += 'AREA ' + currentArea + '<br/>';
 		}
-		multiline += '- ' + obj.monster.name + ' '  +obj.monster.rando + ' in ' + obj.room.title + '<br/>';
+		multiline += '- ' + obj.monster.name + ' in ' + obj.room.title + '<br/>';
 	});
 
 	World.msgPlayer(target, {
