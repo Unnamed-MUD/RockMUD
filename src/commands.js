@@ -114,7 +114,7 @@ function _devMonsters (target, command) {
 			currentArea = obj.room.area;
 			multiline += 'AREA ' + currentArea + '<br/>';
 		}
-		multiline += '- ' + obj.monster.name + ' in ' + obj.room.title + '<br/>';
+		multiline += '- ' + obj.monster.name + ' '  +obj.monster.rando + ' in ' + obj.room.title + '<br/>';
 	});
 
 	World.msgPlayer(target, {
@@ -2111,6 +2111,8 @@ Cmd.prototype.kill = function(player, command, avoidGroupCheck, fn) {
 
 
 			if (!command.target) {
+				roomObj.monsters.forEach(function (monster) {
+				});
 				opponent = World.search(roomObj.monsters, command);
 			} else {
 				opponent = command.target;
@@ -2143,6 +2145,10 @@ Cmd.prototype.kill = function(player, command, avoidGroupCheck, fn) {
 			} else {
 				World.msgPlayer(player, {
 					msg: 'There is nothing by that name here.',
+					styleClass: 'error'
+				});
+				World.msgPlayer(player, {
+					msg: 'opponent room id ' + opponent.roomid + " player " + player.roomid,
 					styleClass: 'error'
 				});
 			}

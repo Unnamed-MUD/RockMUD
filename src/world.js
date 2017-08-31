@@ -2,8 +2,10 @@
 * Working with game-wide data. Areas, races, classes and game time
 */
 'use strict';
-var fs = require('fs'),
-World = function() {},
+var fs = require('fs');
+var clone = require('safe-clone-deep');
+var crypto = require('crypto');
+var World = function() {},
 Character,
 Cmds,
 Skills,
@@ -46,7 +48,7 @@ function sortRooms(rooms) {
 	var tempareas = {};
 	for (var i = 0; i < rooms.length; i++) {
 		var room = rooms[i];
-		room.id = room._id;
+		room.id = room._id.toString();
 		room.playersInRoom = [];
 		if (!tempareas[room.area]) {
 			tempareas[room.area] = []
@@ -768,7 +770,6 @@ World.prototype.setupArea = function(area, fn) {
 				}
 			}
 
-
 			// replace all monster strings with the actual object
 			if (area.rooms[i].monsters) {
 				for(var m = area.rooms[i].monsters.length-1; m >= 0; m--) {
@@ -776,10 +777,11 @@ World.prototype.setupArea = function(area, fn) {
 						var foundMonster = world.getMonster(monsterName);
 						if(foundMonster) {
 							// we have to clone the foundMonster so each instance in game is unique
-							area.rooms[i].monsters[m] = Object.assign({}, foundMonster);
+							area.rooms[i].monsters[m] = clone(foundMonster);
+							//area.rooms[i].monsters[m].rando = (Math.random()+'').slice(2, 10	);
 
 						} else {
-							console.error("🚨  Room '" + area.rooms[i].title + "' has monster '" + monsterName + "' not in database, removing from room.");
+							console.error("🚨  Room '" + area.rooms[i].title + "' has monster '" + monsterName + "' not in monsters/, removing from room.");
 							area.rooms[i].monsters.splice(m, 1);
 						}
 				}
