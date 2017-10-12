@@ -4,8 +4,6 @@ var MongoClient = require('mongodb').MongoClient;
 
 module.exports = {
 	loadRooms: function (callback) {
-		console.log(process.env.DB_HOST);
-
 		// construct URL,
 		var baseURL = 'mongodb://';
 		if(process.env.DB_USER){
@@ -13,7 +11,6 @@ module.exports = {
 			baseURL += process.env.DB_USER + ':' + process.env.DB_PASS + '@';
 		}
 		baseURL += process.env.DB_HOST;
-		console.log(baseURL);
 		MongoClient.connect(baseURL, function(err, db) {
 			if(err) { return console.dir(err); }
 
