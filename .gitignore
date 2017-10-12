@@ -24,3 +24,4 @@ npm-debug.log
 notes.md
 design.html
 /databases/config.json
+secret.json
